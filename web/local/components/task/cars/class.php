@@ -6,6 +6,9 @@ use Bitrix\Main\Loader,
     Bitrix\Highloadblock\HighloadBlockTable;
 
 class TaskCars extends CBitrixComponent {
+    /**
+     * Логика компонента при подключении
+     */
     public function executeComponent() {
         try {
             // Получаем параметры компонента
@@ -38,6 +41,11 @@ class TaskCars extends CBitrixComponent {
         }
     }
 
+    /**
+     * Получает классы комфорта для пользователя
+     * @param mixed $user_id ID пользователя
+     * @throws Exception не найден highload-блок "Positions" или "ComfortClasses"
+     */
     protected function getClassesForUser($user_id) {
         // Получаем должность для пользователя из его UF_POSITION
         $user = CUser::GetByID($user_id)->Fetch();
@@ -104,13 +112,26 @@ class TaskCars extends CBitrixComponent {
      * @param mixed $cars       список автомобилей для фильтрации
      * @param mixed $begin_time время начала поездки
      * @param mixed $end_time   время окончания поездки
+     * @throws Exception инфоблок поездок не найден
      */
     protected function getAvailableCars($cars, $begin_time, $end_time) {
+        global $DB;
+
+        // Получаем код инфоблока поездок
+        $travels_code = CIBlock::GetList([], ['CODE' => 'travels'])->Fetch()['ID'];
+        if(!$travels_code) {
+            throw new Exception('Не найден инфоблок поездок');
+        }
+
+        // Приводим время к формату БД Битрикса для сравнения
+        $begin_time = trim($DB->CharToDateFunction(ConvertTimeStamp($begin_time->getTimestamp(), 'FULL')), '\'');
+        $end_time   = trim($DB->CharToDateFunction(ConvertTimeStamp($end_time->getTimestamp(), 'FULL')), '\'');
+
         // Получаем поездки, пересекающиеся с указанным периодом
         $rsTravels = CIBlockElement::GetList(
             [],
             [
-                'IBLOCK_ID' => $this->arParams['TRIPS_IBLOCK_ID'],
+                'IBLOCK_ID' => $travels_code,
                 'ACTIVE'    => 'Y',
                 // условие, что указанный период не пересекается с данной поездкой:
                 // либо указанный период закончился до начала поездки: PROPERTY_TIME_BEGIN >= $end_time

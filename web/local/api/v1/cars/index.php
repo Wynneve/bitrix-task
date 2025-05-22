@@ -41,8 +41,8 @@ $result = $APPLICATION->IncludeComponent(
     '',
     [
         'USER_ID'    => $user_id,
-        'BEGIN_TIME' => $_GET['begin_time'],
-        'END_TIME'   => $_GET['end_time'],
+        'BEGIN_TIME' => $begin_time,
+        'END_TIME'   => $end_time,
     ],
     null,
     null,
