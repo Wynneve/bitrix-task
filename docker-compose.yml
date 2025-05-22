@@ -1,5 +1,6 @@
 services:
   web:
+    image: wynneve/bitrix-web:latest
     build:
       context: .
       dockerfile: web.Dockerfile
