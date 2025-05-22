@@ -15,8 +15,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 1234567890
       MYSQL_DATABASE: bitrix
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 1234567890
     volumes:
       - db_data:/var/lib/mysql
       - ./db/bitrix.sql:/docker-entrypoint-initdb.d/bitrix.sql
